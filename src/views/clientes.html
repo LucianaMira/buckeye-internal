@@ -1,0 +1,64 @@
+{% include 'header.html' %}
+
+    <div class="container-fluid">
+        
+        <div class="col-sm-10 col-sm-offset-1">
+            <ol class="breadcrumb">
+                <li><a href="{{ path('home') }}">Home</a></li>
+                <li class="active">{{ titulo }}</li>
+            </ol>
+
+            <h2>{{ titulo }}</h2>
+            
+            {% if clientes|length > 0 %}
+                <div class="row">
+                    <div class="col-sm-3 text-center"><strong>Nome</strong></div>
+                    <div class="col-sm-2 text-center"><strong>E-mail</strong></div>
+                    <div class="col-sm-2 text-center"><strong>Telefone</strong></div>
+                    <div class="col-sm-2 text-center"><strong>Cidade</strong></div>
+                    <div class="col-sm-1 text-center"><strong>Estado</strong></div>
+                    <div class="col-sm-1 text-center"><strong>CEP</strong></div>
+                    <div class="col-sm-1 text-center"><strong>A&ccedil;&otilde;es</strong></div>
+                </div>
+            {% endif %}
+            {% for cliente in clientes %}
+                <div class="row">
+                    <div class="col-sm-3 text-center">{{ cliente.nome }}</div>
+                    <div class="col-sm-2 text-center">{{ cliente.email }}</div>
+                    <div class="col-sm-2 text-center">{{ cliente.telefone }}</div>
+                    <div class="col-sm-2 text-center">{{ cliente.cidade }}</div>
+                    <div class="col-sm-1 text-center">{{ cliente.estado }}</div>
+                    <div class="col-sm-1 text-center">{{ cliente.cep }}</div>
+                    <div class="col-sm-1 text-center"><a href="{{ app.request.basepath }}/admin/visualizar-ordens/{{ cliente.id }}">Visualizar ordens</a></div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-sm-12">Ainda n&atilde;o h&aacute; clientes cadastrados no sistema!</div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div><!-- /.container -->
+
+    {% include 'footer.html' %}
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//code.jquery.com/jquery-latest.min.js"></script>
+    <script src="{{ app.request.basepath }}/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+
+        /*$('.navbar li a').click(function(e) {
+          var $this = $(this);
+          if (!$this.hasClass('active')) {
+            $this.addClass('active');
+          }
+          e.preventDefault();
+        });*/
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+{% include 'header.html' %}
+
+    <div class="container-fluid">
+        
+        <div class="col-sm-8 col-sm-offset-2">
+            <ol class="breadcrumb">
+                <li><a href="{{ path('home') }}">Home</a></li>
+                <li class="active">{{ titulo }}</li>
+            </ol>
+
+            <h2>{{ titulo }}</h2>
+            
+            {% if tipos_produtos|length > 0 %}
+                <div class="row">
+                    <div class="col-sm-2 text-center"><strong>#ID</strong></div>
+                    <div class="col-sm-2 text-center"><strong>Tipo</strong></div>
+                    <div class="col-sm-4 text-center"><strong>Descri&ccedil;&atilde;o</strong></div>
+                    <div class="col-sm-4 text-center"><strong>A&ccedil;&otilde;es</strong></div>
+                </div>
+            {% endif %}
+            {% for tipo_produto in tipos_produtos %}
+                <div class="row">
+                    <div class="col-sm-2 text-center">{{ tipo_produto.id }}</div>
+                    <div class="col-sm-2 text-center">{{ tipo_produto.tipo }}</div>
+                    <div class="col-sm-4 text-center">{{ tipo_produto.descricao }}</div>
+                    <div class="col-sm-2 text-center"><a href="{{ app.request.basepath }}/editar-tipo-produto/{{ tipo_produto.id }}">[Editar]</a></div>
+                    <div class="col-sm-2 text-center"><a href="javascript:excluir({{ tipo_produto.id }})">[Excluir]</a></div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-sm-12">Ainda n&atilde;o h&aacute; tipos de produtos cadastrados no sistema!</div>
+                </div>
+            {% endfor %}
+            <a href="{{ app.request.basepath }}/novo-tipo-produto" class="btn btn-primary btn-lg" role="button" style="margin-top:2%">Adicionar novo tipo de produto</a>
+        </div>
+
+    </div><!-- /.container -->
+
+    {% include 'footer.html' %}
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//code.jquery.com/jquery-latest.min.js"></script>
+    <script src="{{ app.request.basepath }}/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+
+        function excluir(id) {
+            if(confirm("Deseja realmente excluir o tipo de produto com identificação #" + id + "?")) {
+                $.get( "{{ app.request.basepath }}/excluir-tipo-produto", { id_tipo: id } )
+                    .done(function( data ) {
+                        alert( data );
+                        location.reload();
+                    })
+                    .fail(function() {
+                        alert( "Erro ao excluir tipo de produto...Tente novamente!" );
+                    });
+            }
+        }
+
+        /*$('.navbar li a').click(function(e) {
+          var $this = $(this);
+          if (!$this.hasClass('active')) {
+            $this.addClass('active');
+          }
+          e.preventDefault();
+        });*/
+    </script>
+
+</body>
+</html>

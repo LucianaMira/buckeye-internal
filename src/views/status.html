@@ -1,0 +1,71 @@
+{% include 'header.html' %}
+
+    <div class="container-fluid">
+        
+        <div class="col-sm-8 col-sm-offset-2">
+            <ol class="breadcrumb">
+                <li><a href="{{ path('home') }}">Home</a></li>
+                <li class="active">{{ titulo }}</li>
+            </ol>
+
+            <h2>{{ titulo }}</h2>
+            
+            {% if statuses|length > 0 %}
+                <div class="row">
+                    <div class="col-sm-1 text-center"><strong>#ID</strong></div>
+                    <div class="col-sm-7 text-center"><strong>Status</strong></div>
+                    <div class="col-sm-4 text-center"><strong>A&ccedil;&otilde;es</strong></div>
+                </div>
+            {% endif %}
+            {% for status in statuses %}
+                <div class="row">
+                    <div class="col-sm-1 text-center">{{ status.id }}</div>
+                    <div class="col-sm-7 text-center">{{ status.nome }}</div>
+                    <div class="col-sm-2 text-center"><a href="{{ app.request.basepath }}/editar-status/{{ status.id }}">[Editar]</a></div>
+                    <div class="col-sm-2 text-center"><a href="javascript:excluir({{ status.id }})">[Excluir]</a></div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-sm-12">Ainda n&atilde;o h&aacute; status cadastrados no sistema!</div>
+                </div>
+            {% endfor %}
+            <a href="{{ app.request.basepath }}/novo-status" class="btn btn-primary btn-lg" role="button" style="margin-top:2%">Adicionar novo status</a>
+        </div>
+
+    </div><!-- /.container -->
+
+    {% include 'footer.html' %}
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//code.jquery.com/jquery-latest.min.js"></script>
+    <script src="{{ app.request.basepath }}/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+
+        function excluir(id) {
+            if(confirm("Deseja realmente excluir o status com identificação #" + id + "?")) {
+                $.get( "{{ app.request.basepath }}/excluir-status", { id_status: id } )
+                    .done(function( data ) {
+                        alert( data );
+                        location.reload();
+                    })
+                    .fail(function() {
+                        alert( "Erro ao excluir status...Tente novamente!" );
+                    });
+            }
+        }
+
+        /*$('.navbar li a').click(function(e) {
+          var $this = $(this);
+          if (!$this.hasClass('active')) {
+            $this.addClass('active');
+          }
+          e.preventDefault();
+        });*/
+    </script>
+
+</body>
+</html>

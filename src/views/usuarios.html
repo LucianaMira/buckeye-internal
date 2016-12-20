@@ -1,0 +1,75 @@
+{% include 'header.html' %}
+
+    <div class="container-fluid">
+        
+        <div class="col-sm-10 col-sm-offset-1">
+            <ol class="breadcrumb">
+                <li><a href="{{ path('home') }}">Home</a></li>
+                <li class="active">{{ titulo }}</li>
+            </ol>
+
+            <h2>{{ titulo }}</h2>
+            
+            {% if usuarios|length > 0 %}
+                <div class="row">
+                    <div class="col-sm-2 text-center"><strong>#ID</strong></div>
+                    <div class="col-sm-2 text-center"><strong>Nome</strong></div>
+                    <div class="col-sm-2 text-center"><strong>Login</strong></div>
+                    <div class="col-sm-2 text-center"><strong>Tipo do usu&aacute;rio</strong></div>
+                    <div class="col-sm-4 text-center"><strong>A&ccedil;&otilde;es</strong></div>
+                </div>
+            {% endif %}
+            {% for usuario in usuarios %}
+                <div class="row">
+                    <div class="col-sm-2 text-center">{{ usuario.id }}</div>
+                    <div class="col-sm-2 text-center">{{ usuario.nome }}</div>
+                    <div class="col-sm-2 text-center">{{ usuario.login }}</div>
+                    <div class="col-sm-2 text-center">{{ usuario.tipo_usuario }}</div>
+                    <div class="col-sm-2 text-center"><a href="{{ app.request.basepath }}/admin/editar-usuario/{{ usuario.id }}">[Editar]</a></div>
+                    <div class="col-sm-2 text-center"><a href="javascript:excluir({{ usuario.id }})">[Excluir]</a></div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-sm-12">Ainda n&atilde;o h&aacute; usu&aacute;rios cadastrados no sistema!</div>
+                </div>
+            {% endfor %}
+            <a href="{{ app.request.basepath }}/admin/registrar-usuario" class="btn btn-primary btn-lg" role="button" style="margin-top:2%">Registrar novo usu&aacute;rio</a>
+        </div>
+
+    </div><!-- /.container -->
+
+    {% include 'footer.html' %}
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//code.jquery.com/jquery-latest.min.js"></script>
+    <script src="{{ app.request.basepath }}/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+
+        function excluir(id) {
+            if(confirm("Deseja realmente excluir o usuário com identificação #" + id + "?")) {
+                $.get( "{{ app.request.basepath }}/admin/excluir-usuario", { id_usuario: id } )
+                    .done(function( data ) {
+                        alert( data );
+                        location.reload();
+                    })
+                    .fail(function() {
+                        alert( "Erro ao excluir usuário...Tente novamente!" );
+                    });
+            }
+        }
+
+        /*$('.navbar li a').click(function(e) {
+          var $this = $(this);
+          if (!$this.hasClass('active')) {
+            $this.addClass('active');
+          }
+          e.preventDefault();
+        });*/
+    </script>
+
+</body>
+</html>
