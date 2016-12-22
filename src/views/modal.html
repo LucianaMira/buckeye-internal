@@ -1,0 +1,168 @@
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Detalhamento do &Iacute;tem (aberto em {{ item.created_at|date("d/m/Y H:i:s") }})</h4>
+                </div>
+                <form method="post" action="{{ app.request.basepath }}/atualiza-item-pedido" id="form-item" accept-charset="ISO-8859-1">
+                <div class="modal-body">
+                    <div class="alert alert-success alert-dismissible hide" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button>
+                        <span class="response-message"></span>
+                    </div>
+                    <div class="alert alert-danger alert-dismissible hide" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button>
+                        <span class="response-message"></span>
+                    </div>
+                    <fieldset>
+                        <legend>Forne&ccedil;a as seguintes informa&ccedil;&otilde;es</legend>
+                        <input type="hidden" name="id_item_pedido" id="id_item_pedido" value="{{ item.idPedido }}">
+
+                        <div class="form-group">
+                            <label for="produto">Produto</label>
+                            <input type="text" class="form-control" name="produto" id="produto" size="25" value="{{ item.produto }}" placeholder="Nome do produto" readonly="readonly">
+                        </div>
+                        <div class="form-group">
+                            <label for="descricao-produto">Descri&ccedil;&atilde;o do produto</label>
+                            <textarea name="descricao-produto" class="form-control" id="descricao-produto" rows="6" cols="12" readonly="readonly">{{ item.descProd }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="numero-serie-produto">N&uacute;mero de s&eacute;rie do produto</label>
+                            <input type="text" class="form-control" name="numero-serie-produto" id="numero-serie-produto" size="25" value="{{ item.prodNSerie }}" placeholder="N&uacute;mero de s&eacute;rie" readonly="readonly">
+                        </div>
+                        <div class="form-group">
+                            <label for="modelo-produto">Modelo do produto</label>
+                            <input type="text" class="form-control" name="modelo-produto" id="modelo-produto" size="25" value="{{ item.prodMod }}" placeholder="Modelo do produto" readonly="readonly">
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo-produto">Tipo do produto</label>
+                            <select class="form-control" name="tipo-produto" id="tipo-produto" readonly="readonly">
+                                <option value=""></option>
+                            {% for tipo_produto in tipos_produto %}
+                                <option value="{{ tipo_produto.id }}"{% if tipo_produto.id == item.idTipoProd %} selected="selected"{% endif %}>{{ tipo_produto.tipo }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantidade">Quantidade</label>
+                            <input type="number" class="form-control" name="quantidade" id="quantidade" min="1" max="100" size="4" value="{{ item.quantidade }}" readonly="readonly">
+                        </div>
+                        <div class="form-group">
+                            <label for="defeito">Defeito</label>
+                            <textarea name="defeito" class="form-control" id="defeito" rows="6" cols="12" readonly="readonly">{{ item.defeito }}</textarea>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label for="prazo_entrega">Prazo para entrega</label>
+                            <input type="date" class="form-control" name="prazo_entrega" id="prazo_entrega" value="{{ item.prazo_entrega|date("Y-m-d") }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="garantia">Garantia</label>
+                            <input type="text" class="form-control" name="garantia" id="garantia" maxlength="255" value="{{ item.garantia }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="fatura">Fatura</label>
+                            <input type="text" class="form-control" name="fatura" id="fatura" maxlength="255" value="{{ item.fatura }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="recebido_por">Recebido por</label>
+                            <select class="form-control" name="recebido_por" id="recebido_por" readonly="readonly">
+                                <option value=""></option>
+                            {% for usuario in usuarios %}
+                                <option value="{{ usuario.id }}"{% if usuario.id == item.recebido_por %} selected="selected"{% endif %}>{{ usuario.nome }} ({{ usuario.login }})</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="chamado">Chamado</label>
+                            <input type="text" class="form-control" name="chamado" id="chamado" maxlength="255" value="{{ item.chamado }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="observacoes">Observa&ccedil;&otilde;es</label>
+                            <textarea name="observacoes" class="form-control" id="observacoes" rows="6" cols="12">{{ item.observacoes }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status deste &iacute;tem do pedido #{{ item.idPedido }}</label>
+                            <select class="form-control" name="status" id="status">
+                                <option value=""></option>
+                            {% for status in statuses %}
+                                <option value="{{ status.id }}"{% if status.id == item.idStatus %} selected="selected"{% endif %}>{{ status.nome }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="valor_maoobra">Valor m&atilde;o de obra</label>
+                            <div class="input-group">
+                                <span class="input-group-addon">R$</span>
+                                <input type="number" class="form-control" name="valor_maoobra" id="valor_maoobra" step="0.01" value="{{ item.maodeobra }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="valor">Valor</label>
+                            <div class="input-group">
+                                <span class="input-group-addon">R$</span>
+                                <input type="number" class="form-control" name="valor" id="valor" step="0.01" value="{{ item.valor_total_item }}">
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Enviar dados</button>
+                </div>
+                </form>
+                <script type="text/javascript">
+                            $(function() {
+                                jQuery('input[type=date]').datepicker({
+                                    dateFormat: 'yy-mm-dd',
+                                    minDate: new Date(),
+                                    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                                    dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+                                    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+                                    monthNames: ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                                    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+                                    nextText: 'Proximo',
+                                    prevText: 'Anterior'
+                                });
+                            });
+
+                            $.ajaxSetup({
+                                contentType: 'application/x-www-form-urlencoded; charset=ISO-8859-1',
+                                beforeSend: function(xhr) {
+                                    console.log("entrou no beforeSend");
+                                    if(xhr.overrideMimeType)
+                                        xhr.overrideMimeType('application/x-www-form-urlencoded; charset=ISO-8859-1');
+                                }
+                            });
+
+                            $( "#form-item" ).submit(function( event ) {
+                                console.log('entrou!');
+
+                                // Stop form from submitting normally
+                                event.preventDefault();
+
+                                // Get some values from elements on the page:
+                                var $form = $( this ),
+                                    url = $form.attr( "action" );
+
+                                // Send the data using post
+                                var posting = $.post( url, $( this ).serialize() );
+
+                                posting.done(function( data ) {
+                                    $('#id_pedido').val(parseInt(data));
+                                    $('h2').html('Pedido #' + data);
+                                    $('.alert-success').removeClass('hide');
+                                    $('.alert-success .response-message').html("Item atualizado com sucesso!");
+                                    $('#modal-form').scrollTop(0);
+                                });
+
+                                posting.fail(function() {
+                                    $('.alert-danger').removeClass('hide');
+                                    $('.alert-danger .response-message').html("Houve algum problema! Tente novamente...");
+                                    $('#modal-form').scrollTop(0);
+                                });
+
+                                $form[0].reset();
+
+                            });
+                </script>
