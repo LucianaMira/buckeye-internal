@@ -1,6 +1,6 @@
 <?php
 
-$app['debug'] = true;
+$app['debug'] = false;
 $app['charset'] = "iso-8859-1";
 
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
