@@ -16,15 +16,15 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 $app->register(new Silex\Provider\SwiftmailerServiceProvider());
 
 $app['swiftmailer.options'] = array(
-    'host' => 'mail.brigadeirogourmetdelicia.com.br',
+    'host' => 'mail.ambarnet.com.br',
     'port' => '25',
-    'username' => 'contato@brigadeirogourmetdelicia.com.br',
-    'password' => 'brig@bru',
+    'username' => 'contato@ambarnet.com.br',
+    'password' => '',
     'encryption' => null,
     'auth_mode' => null
 );
 
-$app['application_mail'] = "alexandre@sparkcup.com";
+$app['application_mail'] = "contato@ambarnet.com.br";
 
 $app->register(new Silex\Provider\SessionServiceProvider());
 
