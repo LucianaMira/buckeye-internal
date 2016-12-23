@@ -445,7 +445,7 @@ $app->post('/atualiza-item-pedido', function (Request $request) use ($app) {
     $chamado = iconv('UTF-8', 'ISO-8859-15//TRANSLIT', trim($request->get('chamado')));
     $observacoes = iconv('UTF-8', 'ISO-8859-15//TRANSLIT', trim($request->get('observacoes')));
     $status = $request->get('status');
-    $recebido_por = intval($request->get('recebido_por'));
+    $recebido_por = intval(trim($request->get('recebido_por')));
     $valor_maodeobra = str_replace(",", ".", trim($request->get('valor_maoobra')));
     $valor = str_replace(",", ".", trim($request->get('valor')));
     $idItem = trim($request->get('id_item_pedido'));
@@ -454,7 +454,7 @@ $app->post('/atualiza-item-pedido', function (Request $request) use ($app) {
                         'fatura' => $fatura, 'chamado' => $chamado, 'observacoes' => $observacoes,
                         'status' => $status, 'valor_maodeobra' => $valor_maodeobra, 'valor' => $valor);
 
-    if($recebido_por == "")
+    if(empty($recebido_por))
         $fieldsToUpdate['recebido_por'] = getUserId($app);
 
     $valor_maodeobra = (empty($valor_maodeobra))?0.00:$valor_maodeobra;
