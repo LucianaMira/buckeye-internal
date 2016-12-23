@@ -21,7 +21,7 @@ $app->get('/home', function() use ($app) {
 
     $token = $app['security']->getToken();
     
-    $sql = "SELECT o.id, o.created_at AS abertura, ip.quantidade, ip.defeito, ";
+    $sql = "SELECT o.id, o.created_at AS abertura, ip.id AS idItem, ip.quantidade, ip.defeito, ";
     $sql .= "sip.nome AS status_nome, p.produto FROM itens_pedido ip INNER JOIN status_item_pedido sip ON ip.status = sip.id ";
     $sql .= "INNER JOIN produtos p ON ip.id_produto = p.id INNER JOIN pedidos o ON o.id = ip.id_pedido WHERE o.id_operador = ? ";
     $sql .= "ORDER BY o.created_at DESC, ip.id DESC";
@@ -35,7 +35,7 @@ $app->get('/home', function() use ($app) {
         if($idPedido == -1) 
             $idPedido = $pedido['id'];
         $idPedido = ($idPedido <> $pedido['id'])?$pedido['id']:$idPedido;
-        $orders['aberto_por'][$idPedido]['itens'][] = array_intersect_key($pedido, array_flip(array('quantidade', 'defeito', 'status_nome', 'produto')));
+        $orders['aberto_por'][$idPedido]['itens'][] = array_intersect_key($pedido, array_flip(array('idItem', 'quantidade', 'defeito', 'status_nome', 'produto')));
         $orders['aberto_por'][$idPedido]['abertura'] = $pedido['abertura'];
     }
 
@@ -44,7 +44,7 @@ $app->get('/home', function() use ($app) {
     else
         $idPedido = -1;
 
-    $sql = "SELECT o.id, o.created_at AS abertura, ip.quantidade, ip.defeito, ";
+    $sql = "SELECT o.id, o.created_at AS abertura, ip.id AS idItem, ip.quantidade, ip.defeito, ";
     $sql .= "sip.nome AS status_nome, p.produto FROM itens_pedido ip INNER JOIN status_item_pedido sip ON ip.status = sip.id ";
     $sql .= "INNER JOIN produtos p ON ip.id_produto = p.id INNER JOIN pedidos o ON o.id = ip.id_pedido WHERE ip.recebido_por = ? ";
     $sql .= "ORDER BY o.created_at DESC, ip.id DESC";
@@ -56,7 +56,7 @@ $app->get('/home', function() use ($app) {
             $idPedido = $pedido['id'];
 
         $idPedido = ($idPedido <> $pedido['id'])?$pedido['id']:$idPedido;
-        $orders['recebido_por'][$idPedido]['itens'][] = array_intersect_key($pedido, array_flip(array('quantidade', 'defeito', 'status_nome', 'produto')));
+        $orders['recebido_por'][$idPedido]['itens'][] = array_intersect_key($pedido, array_flip(array('idItem', 'quantidade', 'defeito', 'status_nome', 'produto')));
         $orders['recebido_por'][$idPedido]['abertura'] = $pedido['abertura'];
     }
 
@@ -65,7 +65,7 @@ $app->get('/home', function() use ($app) {
     else
         $idPedido = -1;
 
-    $sql = "SELECT c.nome, c.email, o.id, o.created_at AS abertura, ip.quantidade, ip.defeito, ";
+    $sql = "SELECT c.nome, c.email, o.id, o.created_at AS abertura, ip.id AS idItem, ip.quantidade, ip.defeito, ";
     $sql .= "sip.nome AS status_nome, p.produto FROM itens_pedido ip INNER JOIN status_item_pedido sip ON ip.status = sip.id ";
     $sql .= "INNER JOIN produtos p ON ip.id_produto = p.id INNER JOIN pedidos o ON o.id = ip.id_pedido INNER JOIN clientes c ON o.id_cliente = c.id WHERE sip.nome = ? ";
     $sql .= "ORDER BY o.created_at DESC, ip.id DESC";
@@ -77,7 +77,7 @@ $app->get('/home', function() use ($app) {
             $idPedido = $pedido['id'];
 
         $idPedido = ($idPedido <> $pedido['id'])?$pedido['id']:$idPedido;
-        $orders['aguardando_atendimento'][$idPedido]['itens'][] = array_intersect_key($pedido, array_flip(array('nome', 'email', 'quantidade', 'defeito', 'status_nome', 'produto')));
+        $orders['aguardando_atendimento'][$idPedido]['itens'][] = array_intersect_key($pedido, array_flip(array('idItem', 'nome', 'email', 'quantidade', 'defeito', 'status_nome', 'produto')));
         $orders['aguardando_atendimento'][$idPedido]['abertura'] = $pedido['abertura'];
     }
 
@@ -86,7 +86,6 @@ $app->get('/home', function() use ($app) {
 
     $nomeUsuario = $app['db']->fetchColumn("SELECT nome FROM usuarios WHERE login = ?", array((string)$token->getUser()->getUsername()), 0);
 
-    //return print_r($orders, true);
     return $app['twig']->render('home.html', array('pedidos' => $orders, 'nomeUsuario' => $nomeUsuario));
 
 })
@@ -118,7 +117,7 @@ $app->post('/insere-item', function(Request $request) use ($app) {
     if(empty($idPedido)) { //se o pedido ainda não existir, eh criado um novo
 
         $idUsuario = getUserId($app);
-        $idCliente = $app['db']->fetchColumn("SELECT id FROM clientes WHERE email = ?", array((string)"operador@buckeye.net"), 0); //mandatory
+        $idCliente = $app['db']->fetchColumn("SELECT id FROM clientes WHERE email = ?", array((string)"operador.sistema@ambarnet.com.br"), 0); //mandatory
 
         $app['db']->insert('pedidos', array('id_cliente' => $idCliente, 'id_operador' => $idUsuario));
         $idPedido = $app['db']->lastInsertId();
@@ -126,6 +125,7 @@ $app->post('/insere-item', function(Request $request) use ($app) {
         $sql = "SELECT nome, email FROM usuarios WHERE id = ?";
         $usuario = $app['db']->fetchAssoc($sql, array(intval($idUsuario)));
 
+        /*
         $message = \Swift_Message::newInstance();
         $message->setSubject(utf8_encode("Nova ordem de serviço aberta - Sistema de Abertura de Chamados - Ambar Technology"));
         $message->setFrom(array("contato@brigadeirogourmetdelicia.com.br"));
@@ -134,6 +134,7 @@ $app->post('/insere-item', function(Request $request) use ($app) {
         $message->setBody("Nova ordem de serviço aberta no Sistema de Abertura de Chamados!\r\n\r\nUsuário (Nome/E-mail): " . $usuario['nome'] . " / " . $usuario['email'] . "\r\nHora/Data:" . date("H:i:s") . " do dia " . date("d/m/Y") . "\r\nAberto a partir do equipamento identificado pelo IP: " . $app['request']->server->get('REMOTE_ADDR'));
         $app['monolog']->addDebug("E-mail: " . $usuario['email']);
         $app['mailer']->send($message);
+        */
     }
 
     $produto = iconv('UTF-8', 'ISO-8859-15//TRANSLIT', trim($request->get('produto')));
@@ -434,6 +435,60 @@ $app->match('/novo-tipo-produto', function (Request $request) use ($app) {
 
     // display the form
     return $app['twig']->render('form-bootstrap.html', array('form' => $form->createView(), 'titulo' => 'Criar novo tipo de produto'));
+});
+
+$app->post('/atualiza-item-pedido', function (Request $request) use ($app) {
+
+    $prazo_entrega = trim($request->get('prazo_entrega'));
+    $garantia = iconv('UTF-8', 'ISO-8859-15//TRANSLIT', trim($request->get('garantia')));
+    $fatura = iconv('UTF-8', 'ISO-8859-15//TRANSLIT', trim($request->get('fatura')));
+    $chamado = iconv('UTF-8', 'ISO-8859-15//TRANSLIT', trim($request->get('chamado')));
+    $observacoes = iconv('UTF-8', 'ISO-8859-15//TRANSLIT', trim($request->get('observacoes')));
+    $status = $request->get('status');
+    $recebido_por = intval($request->get('recebido_por'));
+    $valor_maodeobra = str_replace(",", ".", trim($request->get('valor_maoobra')));
+    $valor = str_replace(",", ".", trim($request->get('valor')));
+    $idItem = trim($request->get('id_item_pedido'));
+
+    $fieldsToUpdate = array('prazo_entrega' => $prazo_entrega, 'garantia' => $garantia,
+                        'fatura' => $fatura, 'chamado' => $chamado, 'observacoes' => $observacoes,
+                        'status' => $status, 'valor_maodeobra' => $valor_maodeobra, 'valor' => $valor);
+
+    if($recebido_por == "")
+        $fieldsToUpdate['recebido_por'] = getUserId($app);
+
+    $valor_maodeobra = (empty($valor_maodeobra))?0.00:$valor_maodeobra;
+    $valor = (empty($valor))?0.00:$valor;
+
+    $app['db']->update('itens_pedido', $fieldsToUpdate, array('id' => $idItem));
+
+    return new Response('Item #' . $idItem . ' atualizado com sucesso!', 200);
+
+});
+
+$app->get('/visualizar-item-full/{id}', function(Request $request, $id) use ($app) {
+
+    $sql = "SELECT ip.id AS idPedido, ip.quantidade, IF(ip.valor IS NULL, '', ip.valor * ip.quantidade) AS valor_total_item, ";
+    $sql = $sql .= "ip.created_at, ip.defeito, IF(ip.valor_maodeobra IS NULL, '', ip.valor_maodeobra) AS maodeobra, ip.prazo_entrega, ";
+    $sql .= "IF(ip.garantia IS NULL, '', ip.garantia) AS garantia, ip.observacoes, IF(ip.fatura IS NULL, '', ip.fatura) AS fatura, ip.recebido_por, ";
+    $sql .= "IF(ip.chamado IS NULL, '', ip.chamado) AS chamado, s.nome AS status, s.id AS idStatus, p.produto, p.descricao AS descProd, ";
+    $sql .= "p.numero_serie AS prodNSerie, p.modelo AS prodMod, tp.tipo AS tipo_produto, tp.id AS idTipoProd FROM itens_pedido ip ";
+    $sql .= "INNER JOIN status_item_pedido s ON ip.status = s.id INNER JOIN produtos p ON ip.id_produto = p.id ";
+    $sql .= "INNER JOIN tipo_produto tp ON p.tipo_produto = tp.id INNER JOIN pedidos o ON o.id = ip.id_pedido WHERE ip.id = ?";
+
+    $item = $app['db']->fetchAssoc($sql, array((int)$id));
+
+    $tipos_produto = $app['db']->fetchAll("SELECT * FROM tipo_produto");
+    $statuses = $app['db']->fetchAll("SELECT * FROM status_item_pedido");
+    $usuarios = $app['db']->fetchAll("SELECT * FROM usuarios");
+
+    return $app['twig']->render('modal.html', array(
+        'item' => $item,
+        'tipos_produto' => $tipos_produto,
+        'statuses' => $statuses,
+        'usuarios' => $usuarios
+    ));
+
 });
 
 $app->match('/editar-tipo-produto/{idTipo}', function (Request $request, $idTipo) use ($app) {

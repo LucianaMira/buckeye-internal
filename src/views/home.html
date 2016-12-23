@@ -15,7 +15,7 @@
                                 <a href="{{ app.request.basepath }}/visualizar-chamado/{{ key }}">Chamado #{{ key }} &minus; aberto em {{ pedidos['aberto_por'][key]['abertura']|date('d/m/Y H:i:s') }}</a>
                                 <ul>
                                 {% for item in pedidos['aberto_por'][key]['itens'] %}
-                                    <li>{{ item['quantidade'] }}&nbsp;{{ item['produto'] }} &minus; {{ item.defeito[:100] }} &minus; <strong>{{ item['status_nome'] }}</strong></li>
+                                    <li><a href="#" data-item-id="{{ item['idItem'] }}" data-toggle="modal" data-target=".bs-example-modal-lg">{{ item['quantidade'] }}&nbsp;{{ item['produto'] }} &minus; {{ item.defeito[:100] }} &minus; <strong>{{ item['status_nome'] }}</strong></a></li>
                                 {% else %}
                                     <li>N&atilde;o h&aacute; &iacute;tens relacionados a este pedido!</li>
                                 {% endfor %}
@@ -40,10 +40,10 @@
                         <ul class="list-unstyled">
                         {% for key in pedidos['recebido_por']|keys %}
                             <li>
-                                <a href="{{ app.request.basepath }}/visualizar-chamado/{{ key }}">Chamado #{{ key }} &minus; aberto em {{ pedidos['recebido_por'][key]['abertura']|date('d/m/Y H:i:s') }}</a>
+                                Chamado #{{ key }} &minus; aberto em {{ pedidos['recebido_por'][key]['abertura']|date('d/m/Y H:i:s') }}
                                 <ul>
                                 {% for item in pedidos['recebido_por'][key]['itens'] %}
-                                    <li>{{ item['quantidade'] }}&nbsp;{{ item['produto'] }} &minus; {{ item.defeito[:100] }} &minus; <strong>{{ item['status_nome'] }}</strong></li>
+                                    <li><a href="#" data-item-id="{{ item['idItem'] }}" data-toggle="modal" data-target=".bs-example-modal-lg">{{ item['quantidade'] }}&nbsp;{{ item['produto'] }} &minus; {{ item.defeito[:100] }} &minus; <strong>{{ item['status_nome'] }}</strong></a></li>
                                 {% else %}
                                     <li>N&atilde;o h&aacute; &iacute;tens relacionados a este pedido!</li>
                                 {% endfor %}
@@ -64,10 +64,10 @@
                         <ul class="list-unstyled">
                         {% for key in pedidos['aguardando_atendimento']|keys %}
                             <li>
-                                <a href="{{ app.request.basepath }}/visualizar-chamado/{{ key }}">Chamado #{{ key }} &minus; aberto em {{ pedidos['aguardando_atendimento'][key]['abertura']|date('d/m/Y H:i:s') }}</a>
+                                Chamado #{{ key }} &minus; aberto em {{ pedidos['aguardando_atendimento'][key]['abertura']|date('d/m/Y H:i:s') }}
                                 <ul>
                                 {% for item in pedidos['aguardando_atendimento'][key]['itens'] %}
-                                    <li>Aberto por <u>{{ item['nome'] }}</u> ({{ item['email'] }}) &minus; <strong>{{ item['quantidade'] }}</strong>&nbsp;{{ item['produto'] }} &minus; {{ item.defeito[:100] }} &minus; <strong>{{ item['status_nome'] }}</strong></li>
+                                    <li><a href="#" data-item-id="{{ item['idItem'] }}" data-toggle="modal" data-target=".bs-example-modal-lg">Aberto por <u>{{ item['nome'] }}</u> ({{ item['email'] }}) &minus; <strong>{{ item['quantidade'] }}</strong>&nbsp;{{ item['produto'] }} &minus; {{ item.defeito[:100] }} &minus; <strong>{{ item['status_nome'] }}</strong></a></li>
                                 {% else %}
                                     <li>N&atilde;o h&aacute; &iacute;tens relacionados a este pedido!</li>
                                 {% endfor %}
@@ -86,13 +86,21 @@
 
     </div><!-- /.container -->
 
+    <div class="modal fade bs-example-modal-lg" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="modalFormLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
     {% include 'footer.html' %}
 
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="//code.jquery.com/jquery-latest.min.js"></script>
+    <script src="{{ app.request.basepath }}/js/jquery-2.1.1.min.js"></script>
+    <script src="{{ app.request.basepath }}/js/jquery-ui.js"></script>
     <script src="{{ app.request.basepath }}/js/bootstrap.min.js"></script>
 
     <script type="text/javascript">
@@ -103,6 +111,24 @@
           }
           e.preventDefault();
         });*/
+
+        $('#modal-form').on('shown.bs.modal', function (e) {
+            $(this).find('.modal-content').html('');
+            
+            var target = $( e.target );
+            var $invoker = $(e.relatedTarget);
+
+            console.log("teste: " + $invoker.data('item-id'));
+
+            $(this).find('.modal-content').load( "{{ app.request.basepath }}/visualizar-item-full/" + $invoker.data('item-id') );
+
+            //e.preventDefault();
+        });
+
+        $('#modal-form').on('hidden.bs.modal', function (e) {
+            location.reload();
+        });
+
     </script>
 
 </body>

@@ -13,6 +13,9 @@
     <!-- Bootstrap core CSS -->
     <link href="{{ app.request.basepath }}/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- JQuery UI CSS -->
+    <link href="{{ app.request.basepath }}/css/jquery-ui.css" rel="stylesheet">
+
     <!-- Custom styles for this template -->
     <link href="{{ app.request.basepath }}/css/buckeye.css" rel="stylesheet">
     <link href="{{ app.request.basepath }}/css/buckeye-extra.css" rel="stylesheet">
@@ -57,7 +60,7 @@
                             {% if is_granted('ROLE_ADMIN') %}
                             <li><a href="{{ app.request.basepath }}/admin/clientes">Listar clientes cadastrados</a></li>
                             {% endif %}
-                            <li><a href="{{ app.request.basepath }}/chamados">Listar suas ordens concluídas</a></li>
+                            <li><a href="#">Listar suas ordens concluídas</a></li>
                         </ul>
                     </li>
                     {% if is_granted('ROLE_ADMIN') %}
